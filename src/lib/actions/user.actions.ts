@@ -1,6 +1,6 @@
 "use server";
-import type { User } from "@prisma/client";
-import { prisma } from "../db";
+import { User } from "@prisma/client";
+import { prisma } from "../db/prisma";
 import { UserCreate } from "../../types";
 
 export async function createUser({
