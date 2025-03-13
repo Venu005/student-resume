@@ -1,4 +1,5 @@
 "use server";
+
 import { User } from "@prisma/client";
 import { prisma } from "../db/prisma";
 import { UserCreate } from "../../types";
