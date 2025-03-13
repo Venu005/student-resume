@@ -3,7 +3,7 @@ import Logo from "../../public/logosaas.png";
 import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
-import { SignOutButton, useAuth } from "@clerk/nextjs";
+import { SignOutButton, useAuth, UserButton } from "@clerk/nextjs";
 import { LogInIcon, LogOutIcon } from "lucide-react";
 import Link from "next/link";
 //! add links later
@@ -37,16 +37,24 @@ export const Header = () => {
               <a href="">Updates</a>
               <a href="">Help</a>
               {isSignedIn ? (
-                <SignOutButton>
-                  <Button
-                    variant={"outline"}
-                    size={"sm"}
-                    className="flex items-center gap-2"
-                  >
-                    <LogOutIcon className="size-4" />
-                    <span className="hidden sm:inline">Logout</span>
+                <div className="flex space-x-4">
+                  <Button asChild variant={"link"}>
+                    <Link href="/dashboard">
+                      <span>Dashboard</span>
+                    </Link>
                   </Button>
-                </SignOutButton>
+                  <SignOutButton>
+                    <Button
+                      variant={"outline"}
+                      size={"sm"}
+                      className="flex items-center gap-2"
+                    >
+                      <LogOutIcon className="size-4" />
+                      <span className="hidden sm:inline">Logout</span>
+                    </Button>
+                  </SignOutButton>
+                  <UserButton />
+                </div>
               ) : (
                 <div className="flex space-x-2">
                   <Button
