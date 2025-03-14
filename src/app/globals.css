@@ -172,3 +172,63 @@
     animation: var(--animation-caret-blink);
   }
 }
+
+.resume-editor-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 20px;
+}
+
+.mode-toggle {
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.mode-toggle button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.mode-toggle button.active {
+  background: #0070f3;
+  color: white;
+}
+
+.markdown-preview {
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  min-height: 800px;
+  background: white;
+}
+
+.save-container {
+  margin-top: 1rem;
+  text-align: right;
+}
+
+.save-button {
+  background: #4caf50;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+}
+
+.save-button:hover {
+  background: #45a049;
+}
+
+.w-md-editor {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
