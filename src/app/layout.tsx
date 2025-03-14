@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import { twMerge } from "tailwind-merge";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Header } from "@/components/Header";
 
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <ClerkProvider>
         <body className={twMerge(dmSans.className, "antialiased bg-[#EAEEFE]")}>
+          <Header />
           {children}
         </body>
       </ClerkProvider>
