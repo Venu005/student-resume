@@ -1,16 +1,10 @@
 "use client";
 
-import { deleteResume } from "@/lib/actions/resume.actions";
 import { Resume } from "@prisma/client";
-import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
+import ResumeCard from "./ResumeCard";
 
 export function ResumeCards({ resumes }: { resumes: Resume[] }) {
-  const router = useRouter();
-
   if (!resumes) {
     return (
       <div className="flex justify-center">
@@ -19,22 +13,10 @@ export function ResumeCards({ resumes }: { resumes: Resume[] }) {
     );
   }
 
-  async function handleDelete(id: string) {
-    try {
-      const res = await deleteResume(id);
-      if (res) {
-        toast.success(res.message);
-      }
-      router.refresh();
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to delete resume");
-    }
-  }
-
   return (
     <ul className="w-full divide-y divide-gray-200 dark:divide-gray-700">
       {resumes.map((resume) => (
+<<<<<<< HEAD
         <motion.div
           key={resume.id}
           className="p-4 flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-xl cursor-pointer"
@@ -70,6 +52,9 @@ export function ResumeCards({ resumes }: { resumes: Resume[] }) {
             </motion.button>
           </div>
         </motion.div>
+=======
+        <ResumeCard key={resume.id} resume={resume} />
+>>>>>>> bc510d223dfc1a4ad852a48b18e4c962717ba199
       ))}
     </ul>
   );

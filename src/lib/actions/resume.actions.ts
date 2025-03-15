@@ -2,6 +2,7 @@
 
 import { currentUser } from "@clerk/nextjs/server";
 import prisma from "../db/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function getUserResume() {
   try {
@@ -33,6 +34,8 @@ export async function deleteResume(id: string) {
         id: id,
       },
     });
+
+    revalidatePath("/resume-enhancer");
 
     return { message: "Resume deleted successfully" };
   } catch (error) {

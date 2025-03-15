@@ -15,7 +15,7 @@ import { UserButton } from "@clerk/nextjs";
 export const HomeSideBar = () => {
   return (
     <Sidebar
-      className=" z-40  border-r-2 pt-18 " // Changed background color here
+      className=" z-40  border-r-2 pt-18"
       collapsible="icon"
       variant="sidebar"
     >

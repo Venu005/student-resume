@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from "react";
 import MDEditor from "@uiw/react-md-editor";
 import { z } from "zod";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { Button } from "./ui/button";
+import { Loader2 } from "lucide-react";
 
 const ResumeDataSchema = z
   .object({
@@ -68,12 +69,10 @@ const ResumeDataSchema = z
 
 type ResumeData = z.infer<typeof ResumeDataSchema>;
 
-// Updated JSON to Markdown converter with null checks
 const jsonToMarkdown = (data: unknown): string => {
   const parseResult = ResumeDataSchema.safeParse(data);
 
   if (!parseResult.success) {
-    console.error("Invalid resume data:", parseResult.error);
     return "# Invalid Resume Format";
   }
 
@@ -148,7 +147,6 @@ const jsonToMarkdown = (data: unknown): string => {
   return md;
 };
 
-// Updated component with validation
 interface ResumeEditorProps {
   resumeData: unknown;
 }
@@ -169,56 +167,108 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
     }
   }, [resumeData]);
 
-  const handleSave = async () => {
-    try {
-      console.log("Saving resume...", value);
-    } catch (error) {
-      console.error("Save error:", error);
-      alert("Error saving resume");
-    }
-  };
-
-  // Update the handleDownload function with these changes
   const handleDownload = async () => {
-    if (!previewRef.current || isDownloading) return;
+    if (isDownloading) return;
 
     try {
       setIsDownloading(true);
 
-      // Ensure preview mode is active
-      setPreviewMode("preview");
-
-      // Add slight delay for DOM update
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      const canvas = await html2canvas(previewRef.current, {
-        scale: 2, // Increase resolution
-        logging: true, // Enable logging
-        useCORS: true, // Handle external resources
-        windowWidth: previewRef.current.scrollWidth,
-        windowHeight: previewRef.current.scrollHeight,
-      });
-      console.log(canvas);
-      const imgData = canvas.toDataURL("image/png", 1.0);
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const ratio = pageWidth / canvas.width;
-      const imgHeight = canvas.height * ratio;
-      console.log(imgData);
-      // Add image with proper scaling
-      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
+      const margin = 15;
+      const lineHeight = 7;
+      let verticalPosition = margin;
 
-      // Add new page if content overflows
-      if (imgHeight > pageHeight) {
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, -pageHeight, pageWidth, imgHeight);
-      }
+      // Set default font styles
+      pdf.setFont("helvetica");
+      pdf.setFontSize(11);
+
+      // Configure text styling
+      const addText = (
+        text: string,
+        fontSize: number,
+        isBold: boolean = false,
+        marginLeft: number = margin
+      ) => {
+        pdf.setFontSize(fontSize);
+        pdf.setFont("helvetica", isBold ? "bold" : "normal");
+        const lines = pdf.splitTextToSize(
+          text,
+          pageWidth - marginLeft - margin
+        );
+        lines.forEach((line: string) => {
+          if (
+            verticalPosition + lineHeight >
+            pdf.internal.pageSize.getHeight() - margin
+          ) {
+            pdf.addPage();
+            verticalPosition = margin;
+          }
+          pdf.text(line, marginLeft, verticalPosition);
+          verticalPosition += lineHeight;
+        });
+      };
+
+      // Add section headings
+      const addSectionHeading = (text: string) => {
+        addText(text, 13, true);
+        verticalPosition += 3; // Add small space after heading
+      };
+
+      // Parse contact information
+      const contactLines = value
+        .split("\n")
+        .slice(0, 5)
+        .filter((l) => l.trim());
+      const name = contactLines[0].replace("#", "").trim();
+      const contactInfo = contactLines
+        .slice(1)
+        .map((line) => line.replace(/\*\*/g, "").replace(":", ""));
+
+      // Add header section
+      addText(name, 16, true, margin);
+      verticalPosition += 4;
+      contactInfo.forEach((line) => {
+        addText(line, 11, false, margin);
+        verticalPosition += 1;
+      });
+      verticalPosition += 8;
+
+      // Process main content
+      const sections = value.split("## ").slice(1); // Skip contact info
+
+      sections.forEach((section) => {
+        const [heading, ...content] = section.split("\n");
+        const cleanHeading = heading.replace(/#/g, "").trim();
+
+        addSectionHeading(cleanHeading.toUpperCase());
+
+        content
+          .filter((l) => l.trim())
+          .forEach((line) => {
+            const cleanLine = line
+              .replace(/\*\*/g, "")
+              .replace(/^-\s*/, "• ")
+              .replace(/^###\s*/, "");
+
+            if (cleanLine.startsWith("•")) {
+              addText(cleanLine, 11, false, margin + 5);
+            } else if (cleanLine.includes(":")) {
+              const [label, value] = cleanLine.split(":");
+              addText(`${label.trim()}:`, 11, true, margin);
+              addText(value.trim(), 11, false, margin + 8);
+            } else {
+              addText(cleanLine, 11, false, margin);
+            }
+          });
+
+        verticalPosition += 6; // Add space between sections
+      });
 
       pdf.save("resume.pdf");
     } catch (error) {
       console.error("Download failed:", error);
-      alert(`Error generating PDF`);
+      alert("Error generating PDF");
     } finally {
       setIsDownloading(false);
     }
@@ -245,12 +295,13 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         <div className="markdown-preview" ref={previewRef}>
           <MDEditor.Markdown
             source={value}
+            data-color-mode="light"
             style={{
               padding: "1rem",
-              border: "1px solid #e2e8f0",
+              border: "1px solid var(--border)",
               borderRadius: "0.5rem",
-              backgroundColor: "white",
-              color: "black",
+              backgroundColor: "var(--background)",
+              color: "var(--foreground)",
             }}
           />
         </div>
@@ -264,6 +315,7 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         />
       )}
 
+<<<<<<< HEAD
       <div className="save-container">
         <button onClick={handleSave} className="save-button">
           Save Changes
@@ -280,6 +332,30 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         >
           {isDownloading ? "Generating PDF..." : "Download PDF"}
         </button>
+=======
+      <div className="save-container w-full flex items-center justify-end">
+        <div className="flex gap-3">
+          <Button
+            onClick={() => {
+              console.log("clicking");
+              handleDownload().catch((error) =>
+                console.error("Download error:", error)
+              );
+            }}
+            disabled={isDownloading}
+            className="download-button bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400 cursor-pointer"
+          >
+            {isDownloading ? (
+              <div className="flex gap-2 items-center">
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span className="ml-2">Generating PDF...</span>
+              </div>
+            ) : (
+              "Download PDF"
+            )}
+          </Button>
+        </div>
+>>>>>>> bc510d223dfc1a4ad852a48b18e4c962717ba199
       </div>
     </div>
   );
