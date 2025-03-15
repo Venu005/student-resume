@@ -8,6 +8,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Loader2 } from "lucide-react";
 
 export function EnhancementPanel({ resumeData }: { resumeData: any }) {
   const [jobDescription, setJobDescription] = useState("");
@@ -42,8 +43,19 @@ export function EnhancementPanel({ resumeData }: { resumeData: any }) {
           placeholder="Paste job description here"
           className="h-40"
         />
-        <Button onClick={handleEnhance} disabled={loading}>
-          {loading ? "Analyzing..." : "Enhance Resume"}
+        <Button
+          onClick={handleEnhance}
+          disabled={loading}
+          className="cursor-pointer"
+        >
+          {loading ? (
+            <div className="flex gap-2 items-center">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="ml-2">Enhancing...</span>
+            </div>
+          ) : (
+            "Enhance Resume"
+          )}
         </Button>
 
         {suggestions && (
