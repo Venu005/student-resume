@@ -44,14 +44,20 @@ export async function deleteResume(id: string) {
 export async function getResumeById(id: string) {
   try {
     const resume = await prisma.resume.findUnique({
-      where: {
-        id: id,
-      },
+      where: { id },
     });
 
-    return resume;
+    if (!resume) throw new Error("Resume not found");
+
+    // Parse the resume content with proper error handling
+    const parsedResume = JSON.parse(JSON.stringify(resume.resume));
+
+    return {
+      ...resume,
+      resume: parsedResume,
+    };
   } catch (error) {
-    console.error(error);
-    throw new Error("Failed to get resume by id");
+    console.error("Database error:", error);
+    throw new Error("Failed to fetch resume");
   }
 }

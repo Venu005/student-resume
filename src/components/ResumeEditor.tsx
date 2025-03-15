@@ -1,53 +1,87 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import MDEditor from "@uiw/react-md-editor";
+import { z } from "zod";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
-interface ContactInfo {
-  name: string;
-  email: string;
-  phone: string;
-  location: string | null;
-  linkedin: string | null;
-  portfolio: string | null;
-}
+const ResumeDataSchema = z
+  .object({
+    contact_info: z.object({
+      name: z.string(),
+      email: z.string().email(),
+      phone: z.string(),
+      location: z.string().nullable().optional().default(""),
+      linkedin: z.string().nullable().optional().default(""),
+      portfolio: z.string().nullable().optional().default(""),
+    }),
+    skills: z.array(z.string()).nullable().default([]),
+    education: z
+      .array(
+        z.object({
+          degree: z.string(),
+          institution: z.string(),
+          dates: z.string(),
+          gpa: z.string().nullable().optional().default(""),
+        })
+      )
+      .nullable()
+      .default([]),
+    experience: z
+      .array(
+        z.object({
+          title: z.string(),
+          company: z.string(),
+          dates: z.string(),
+          responsibilities: z
+            .array(z.string())
+            .nullable()
+            .optional()
+            .default([]),
+        })
+      )
+      .nullable()
+      .default([]),
+    certifications: z.array(z.string()).nullable().optional().default([]),
+    projects: z
+      .array(
+        z.object({
+          name: z.string(),
+          description: z.array(z.string()).nullable().optional().default([]),
+          technologies: z.array(z.string()).nullable().optional().default([]),
+        })
+      )
+      .nullable()
+      .default([]),
+    languages: z.array(z.string()).nullable().optional().default([]),
+  })
+  .transform((data) => ({
+    // Transform null arrays to empty arrays
+    ...data,
+    skills: data.skills || [],
+    education: data.education || [],
+    experience: data.experience || [],
+    projects: data.projects || [],
+    certifications: data.certifications || [],
+    languages: data.languages || [],
+  }));
 
-interface Education {
-  degree: string;
-  institution: string;
-  dates: string;
-  gpa: string | null;
-}
+type ResumeData = z.infer<typeof ResumeDataSchema>;
 
-interface Experience {
-  title: string;
-  company: string;
-  dates: string;
-  responsibilities: string[] | null;
-}
+// Updated JSON to Markdown converter with null checks
+const jsonToMarkdown = (data: unknown): string => {
+  const parseResult = ResumeDataSchema.safeParse(data);
 
-interface Project {
-  name: string;
-  description: string;
-  technologies: string[] | null;
-}
+  if (!parseResult.success) {
+    console.error("Invalid resume data:", parseResult.error);
+    return "# Invalid Resume Format";
+  }
 
-interface ResumeData {
-  contact_info: ContactInfo;
-  skills: string[];
-  education: Education[];
-  experience: Experience[];
-  certifications: string[] | null;
-  projects: Project[];
-  languages: string[] | null;
-}
-
-// JSON to Markdown converter
-const jsonToMarkdown = (data: ResumeData): string => {
+  const validData = parseResult.data;
   let md = "";
 
   // Contact Information
-  const { contact_info } = data;
+  const { contact_info } = validData;
   md += `# ${contact_info.name}\n\n`;
   md += `**Email:** ${contact_info.email}\n`;
   md += `**Phone:** ${contact_info.phone}\n`;
@@ -58,16 +92,16 @@ const jsonToMarkdown = (data: ResumeData): string => {
   md += "\n";
 
   // Skills
-  if (data.skills.length > 0) {
+  if (validData.skills?.length) {
     md += "## Skills\n\n";
-    data.skills.forEach((skill) => (md += `- ${skill}\n`));
+    validData.skills.forEach((skill) => (md += `- ${skill}\n`));
     md += "\n";
   }
 
   // Education
-  if (data.education.length > 0) {
+  if (validData.education?.length) {
     md += "## Education\n\n";
-    data.education.forEach((edu) => {
+    validData.education.forEach((edu) => {
       md += `### ${edu.degree}\n`;
       md += `**Institution:** ${edu.institution}\n`;
       md += `**Dates:** ${edu.dates}\n`;
@@ -77,9 +111,9 @@ const jsonToMarkdown = (data: ResumeData): string => {
   }
 
   // Experience
-  if (data.experience.length > 0) {
+  if (validData.experience?.length) {
     md += "## Experience\n\n";
-    data.experience.forEach((exp) => {
+    validData.experience.forEach((exp) => {
       md += `### ${exp.title}\n`;
       md += `**Company:** ${exp.company}\n`;
       md += `**Dates:** ${exp.dates}\n`;
@@ -92,13 +126,19 @@ const jsonToMarkdown = (data: ResumeData): string => {
   }
 
   // Projects
-  if (data.projects.length > 0) {
+  if (validData.projects?.length) {
     md += "## Projects\n\n";
-    data.projects.forEach((project) => {
+    validData.projects.forEach((project) => {
       md += `### ${project.name}\n`;
-      md += `${project.description}\n`;
+
+      // Add description bullets
+      if (project.description?.length) {
+        project.description.forEach((desc) => (md += `- ${desc}\n`));
+      }
+
+      // Add technologies
       if (project.technologies?.length) {
-        md += "**Technologies:**\n";
+        md += "\n**Technologies:**\n";
         project.technologies.forEach((tech) => (md += `- ${tech}\n`));
       }
       md += "\n";
@@ -108,18 +148,25 @@ const jsonToMarkdown = (data: ResumeData): string => {
   return md;
 };
 
-// React component
+// Updated component with validation
 interface ResumeEditorProps {
-  resumeData: ResumeData;
+  resumeData: unknown;
 }
 
 const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
   const [value, setValue] = useState<string>("");
   const [previewMode, setPreviewMode] = useState<"edit" | "preview">("edit");
+  const [isDownloading, setIsDownloading] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const initialMarkdown = jsonToMarkdown(resumeData);
-    setValue(initialMarkdown);
+    try {
+      const initialMarkdown = jsonToMarkdown(resumeData);
+      setValue(initialMarkdown);
+    } catch (error) {
+      console.error("Error initializing editor:", error);
+      setValue("# Error loading resume data");
+    }
   }, [resumeData]);
 
   const handleSave = async () => {
@@ -128,6 +175,52 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
     } catch (error) {
       console.error("Save error:", error);
       alert("Error saving resume");
+    }
+  };
+
+  // Update the handleDownload function with these changes
+  const handleDownload = async () => {
+    if (!previewRef.current || isDownloading) return;
+
+    try {
+      setIsDownloading(true);
+
+      // Ensure preview mode is active
+      setPreviewMode("preview");
+
+      // Add slight delay for DOM update
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const canvas = await html2canvas(previewRef.current, {
+        scale: 2, // Increase resolution
+        logging: true, // Enable logging
+        useCORS: true, // Handle external resources
+        windowWidth: previewRef.current.scrollWidth,
+        windowHeight: previewRef.current.scrollHeight,
+      });
+      console.log(canvas);
+      const imgData = canvas.toDataURL("image/png", 1.0);
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const ratio = pageWidth / canvas.width;
+      const imgHeight = canvas.height * ratio;
+      console.log(imgData);
+      // Add image with proper scaling
+      pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
+
+      // Add new page if content overflows
+      if (imgHeight > pageHeight) {
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, -pageHeight, pageWidth, imgHeight);
+      }
+
+      pdf.save("resume.pdf");
+    } catch (error) {
+      console.error("Download failed:", error);
+      alert(`Error generating PDF`);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -148,7 +241,20 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         </button>
       </div>
 
-      {previewMode === "edit" ? (
+      {previewMode === "preview" ? (
+        <div className="markdown-preview" ref={previewRef}>
+          <MDEditor.Markdown
+            source={value}
+            style={{
+              padding: "1rem",
+              border: "1px solid #e2e8f0",
+              borderRadius: "0.5rem",
+              backgroundColor: "white",
+              color: "black",
+            }}
+          />
+        </div>
+      ) : (
         <MDEditor
           value={value}
           onChange={(value) => setValue(value || "")}
@@ -156,15 +262,23 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
           preview="edit"
           data-color-mode="light"
         />
-      ) : (
-        <div className="markdown-preview">
-          <MDEditor.Markdown source={value} />
-        </div>
       )}
 
       <div className="save-container">
         <button onClick={handleSave} className="save-button">
           Save Changes
+        </button>
+        <button
+          onClick={() => {
+            console.log("clicking")
+            handleDownload().catch((error) =>
+              console.error("Download error:", error)
+            );
+          }}
+          disabled={isDownloading}
+          className="download-button bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
+        >
+          {isDownloading ? "Generating PDF..." : "Download PDF"}
         </button>
       </div>
     </div>
