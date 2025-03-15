@@ -3,6 +3,7 @@
 import { currentUser } from "@clerk/nextjs/server";
 import Groq from "groq-sdk";
 import prisma from "../db/prisma";
+import { revalidatePath } from "next/cache";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -118,6 +119,8 @@ ${text}`;
           fileName: resumeFile.name,
         },
       });
+
+      revalidatePath("/resume-enhancer");
 
       return newResume ? JSON.stringify(newResume) : null;
     }

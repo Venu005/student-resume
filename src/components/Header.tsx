@@ -38,11 +38,12 @@ export const Header = () => {
             </Link>
 
             <nav className="hidden md:flex gap-6 text-black/60 items-center">
-              <a href="">About</a>
-              <a href="">Features</a>
-              <a href="">Custmers</a>
-              <a href="">Updates</a>
-              <a href="">Help</a>
+              <Link
+                href="https://github.com/Venu005/student-resume"
+                className="hover:underline"
+              >
+                About
+              </Link>
               {isSignedIn ? (
                 <div className="flex space-x-4">
                   <Button asChild variant={"link"}>
