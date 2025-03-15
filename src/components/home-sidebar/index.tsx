@@ -1,6 +1,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
@@ -9,6 +10,8 @@ import { Mainsection } from "./main-section";
 import Link from "next/link";
 import Image from "next/image";
 import Logo from "../../../public/logosaas.png";
+import { UserButton } from "@clerk/nextjs";
+
 export const HomeSideBar = () => {
   return (
     <Sidebar
@@ -19,7 +22,6 @@ export const HomeSideBar = () => {
       <SidebarHeader className="bg-[#EAEEFE]">
         <Link href={"/"} className="flex space-x-3">
           <Image src={Logo} alt="Saas logo" height={40} width={40} />
-          <span className="pt-2  text-xl">NextStep AI</span>
         </Link>
       </SidebarHeader>
       <SidebarContent className="bg-[#EAEEFE]">
@@ -27,6 +29,11 @@ export const HomeSideBar = () => {
         <Mainsection />
         <Separator />
       </SidebarContent>
+      <SidebarFooter className="bg-[#EAEEFE]">
+        <div>
+          <UserButton />
+        </div>
+      </SidebarFooter>
     </Sidebar>
   );
 };

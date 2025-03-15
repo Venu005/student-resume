@@ -33,7 +33,7 @@ export function ResumeCards({ resumes }: { resumes: Resume[] }) {
   }
 
   return (
-    <ul className="max-w-2xl mx-auto w-full gap-4">
+    <ul className="w-full divide-y divide-gray-200 dark:divide-gray-700">
       {resumes.map((resume) => (
         <motion.div
           key={resume.id}
@@ -42,7 +42,7 @@ export function ResumeCards({ resumes }: { resumes: Resume[] }) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <div className="flex gap-4 flex-col md:flex-row">
+          <div className="flex flex-col md:flex-row justify-between items-center hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg p-4 transition-colors">
             <div>
               <motion.h3 className="font-medium text-neutral-800 dark:text-neutral-200 text-center md:text-left">
                 {resume.fileName}

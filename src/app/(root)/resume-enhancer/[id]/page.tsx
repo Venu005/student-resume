@@ -4,7 +4,8 @@ import { getResumeById } from "@/lib/actions/resume.actions";
 import { Loader2 } from "lucide-react";
 
 export default async function Page({ params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = await params;
+  console.log(id, typeof id);
   const resume = await getResumeById(id);
 
   if (!resume?.resume) {

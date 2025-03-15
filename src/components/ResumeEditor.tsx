@@ -270,7 +270,7 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         </button>
         <button
           onClick={() => {
-            console.log("clicking")
+            console.log("clicking");
             handleDownload().catch((error) =>
               console.error("Download error:", error)
             );

@@ -1,17 +1,31 @@
 import AddResume from "@/components/AddResume";
 import ShowResume from "@/components/ShowResume";
+import Link from "next/link";
+import { Button } from "@/components/ui/button"; // Assuming you're using a Button component
 
-export default function page() {
+export default function Page() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center pt-24 pb-8 md:pt-32">
-      <div className="container relative max-w-4xl mb-8">
-        {" "}
-        <div className="w-full flex justify-center">
-          <AddResume />
+    <div className="min-h-screen flex flex-col pt-24 pb-8 md:pt-32">
+      <div className="container max-w-4xl mx-auto px-4 mb-8">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            Your List of Resumes
+          </h1>
+          <div className="flex gap-4">
+            <Button
+              asChild
+              className="bg-green-600 hover:bg-green-700 text-white hover:cursor-pointer"
+            >
+              <Link href="/career-guidance">Career Guidance</Link>
+            </Button>
+
+            <AddResume />
+          </div>
         </div>
       </div>
-      <div className="flex-1 w-full flex items-center justify-center -mt-24">
-        {" "}
+
+      {/* Resume List Section */}
+      <div className="container max-w-4xl mx-auto px-4 flex-1">
         <ShowResume />
       </div>
     </div>

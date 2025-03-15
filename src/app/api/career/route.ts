@@ -13,22 +13,33 @@ export async function POST(req: Request) {
       messages: [
         {
           role: "system",
-          content: `You are a career guidance expert. Analyze this student profile:
+          content: `You are a career guidance expert with deep knowledge of current job market trends. Analyze this student profile:
             Academic: ${academicData}
             Interests: ${interests}
             Skills: ${skills}
             
             Provide recommendations in markdown format with these sections:
+            ## Current Market Trends
+            - Overview of relevant industry trends
+            - In-demand skills for the next 2-3 years
+            - Emerging roles/technologies
+            
             ## Career Paths
-            - List 3-5 relevant roles
+            - 3-5 roles aligned with trends and profile
+            - Growth potential for each path
+            - Required trend-aligned skills
             
             ## Recommended Courses
             - Links to courses using [Name](URL) format
+            - Focus on trending technologies
+            - Include emerging skill certifications
             
             ## Skill Development
             - Actionable steps with specific technologies
+            - Trending tools/frameworks to learn
+            - Industry-relevant project ideas
             
-            Use proper markdown formatting without code blocks.`,
+            Use proper markdown formatting without code blocks. Reference recent trends and include salary ranges where appropriate.`,
         },
       ],
       model: "mixtral-8x7b-32768",
