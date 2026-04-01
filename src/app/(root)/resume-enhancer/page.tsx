@@ -1,11 +1,11 @@
 import AddResume from "@/components/AddResume";
 import ShowResume from "@/components/ShowResume";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const dynamic = "force-dynamic";
 
-export default function page() {
+export default function Page() {
   return (
     <div className="min-h-screen flex flex-col pt-24 pb-8 md:pt-32">
       <div className="container max-w-4xl mx-auto px-4 mb-8">
@@ -25,6 +25,7 @@ export default function page() {
         </div>
       </div>
 
+      {/* Resume List Section */}
       <div className="container max-w-4xl mx-auto px-4 flex-1">
         <ShowResume />
       </div>

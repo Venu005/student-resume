@@ -24,7 +24,7 @@ const ResumeDataSchema = z
           institution: z.string(),
           dates: z.string(),
           gpa: z.string().nullable().optional().default(""),
-        })
+        }),
       )
       .nullable()
       .default([]),
@@ -39,7 +39,7 @@ const ResumeDataSchema = z
             .nullable()
             .optional()
             .default([]),
-        })
+        }),
       )
       .nullable()
       .default([]),
@@ -50,7 +50,7 @@ const ResumeDataSchema = z
           name: z.string(),
           description: z.array(z.string()).nullable().optional().default([]),
           technologies: z.array(z.string()).nullable().optional().default([]),
-        })
+        }),
       )
       .nullable()
       .default([]),
@@ -188,13 +188,13 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         text: string,
         fontSize: number,
         isBold: boolean = false,
-        marginLeft: number = margin
+        marginLeft: number = margin,
       ) => {
         pdf.setFontSize(fontSize);
         pdf.setFont("helvetica", isBold ? "bold" : "normal");
         const lines = pdf.splitTextToSize(
           text,
-          pageWidth - marginLeft - margin
+          pageWidth - marginLeft - margin,
         );
         lines.forEach((line: string) => {
           if (
@@ -321,7 +321,7 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
             onClick={() => {
               console.log("clicking");
               handleDownload().catch((error) =>
-                console.error("Download error:", error)
+                console.error("Download error:", error),
               );
             }}
             disabled={isDownloading}
