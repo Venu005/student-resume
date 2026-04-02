@@ -18,6 +18,9 @@ export async function getUserResume() {
       where: {
         clerkId: clerkId,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     return resumes;

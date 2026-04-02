@@ -1,12 +1,6 @@
-import { Suspense } from "react";
-import { getUserResume } from "@/lib/actions/resume.actions";
-import { ResumeCards } from "./ResumeCards";
 import { Loader2 } from "lucide-react";
-
-async function ShowResumeContent() {
-  const resumes = await getUserResume();
-  return <ResumeCards resumes={resumes} />;
-}
+import { Suspense } from "react";
+import ShowResumeContent from "./ShowResumeContent";
 
 export default function ShowResume() {
   return (

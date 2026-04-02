@@ -41,12 +41,38 @@ Follow these steps to set up the project locally:
    cd student-resume-enhancer
    ```
 
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   # or
+   bun dev
+   ```
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
 ## Contributors
 
 We'd like to thank the following contributors for their efforts in building this project:
 
-| Contributor                                              | GitHub Profile                                     |
-| -------------------------------------------------------- | -------------------------------------------------- |
-| ![Venusai](https://github.com/Venu005.png?size=50)       | [Venusai](https://github.com/Venu005) |
-| ![Kushal](https://github.com/nagakushal786.png?size=50) | [Kushal](https://github.com/nagakushal786)  |
+| Contributor                                              | GitHub Profile                             |
+| -------------------------------------------------------- | ------------------------------------------ |
+| ![Venusai](https://github.com/Venu005.png?size=50)       | [Venusai](https://github.com/Venu005)      |
+| ![Kushal](https://github.com/nagakushal786.png?size=50)  | [Kushal](https://github.com/nagakushal786) |
 | ![Shaik Aftab](https://github.com/Aftab3008.png?size=50) | [Aftab](https://github.com/Aftab3008)      |

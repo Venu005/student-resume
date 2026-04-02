@@ -24,7 +24,7 @@ const ResumeDataSchema = z
           institution: z.string(),
           dates: z.string(),
           gpa: z.string().nullable().optional().default(""),
-        })
+        }),
       )
       .nullable()
       .default([]),
@@ -39,7 +39,7 @@ const ResumeDataSchema = z
             .nullable()
             .optional()
             .default([]),
-        })
+        }),
       )
       .nullable()
       .default([]),
@@ -50,7 +50,7 @@ const ResumeDataSchema = z
           name: z.string(),
           description: z.array(z.string()).nullable().optional().default([]),
           technologies: z.array(z.string()).nullable().optional().default([]),
-        })
+        }),
       )
       .nullable()
       .default([]),
@@ -188,13 +188,13 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         text: string,
         fontSize: number,
         isBold: boolean = false,
-        marginLeft: number = margin
+        marginLeft: number = margin,
       ) => {
         pdf.setFontSize(fontSize);
         pdf.setFont("helvetica", isBold ? "bold" : "normal");
         const lines = pdf.splitTextToSize(
           text,
-          pageWidth - marginLeft - margin
+          pageWidth - marginLeft - margin,
         );
         lines.forEach((line: string) => {
           if (
@@ -315,31 +315,13 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
         />
       )}
 
-<<<<<<< HEAD
-      <div className="save-container">
-        <button onClick={handleSave} className="save-button">
-          Save Changes
-        </button>
-        <button
-          onClick={() => {
-            console.log("clicking");
-            handleDownload().catch((error) =>
-              console.error("Download error:", error)
-            );
-          }}
-          disabled={isDownloading}
-          className="download-button bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
-        >
-          {isDownloading ? "Generating PDF..." : "Download PDF"}
-        </button>
-=======
       <div className="save-container w-full flex items-center justify-end">
         <div className="flex gap-3">
           <Button
             onClick={() => {
               console.log("clicking");
               handleDownload().catch((error) =>
-                console.error("Download error:", error)
+                console.error("Download error:", error),
               );
             }}
             disabled={isDownloading}
@@ -355,7 +337,6 @@ const ResumeEditor: React.FC<ResumeEditorProps> = ({ resumeData }) => {
             )}
           </Button>
         </div>
->>>>>>> bc510d223dfc1a4ad852a48b18e4c962717ba199
       </div>
     </div>
   );
